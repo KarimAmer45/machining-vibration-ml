@@ -386,4 +386,75 @@ def _find_column(normalized_columns: dict[str, str], aliases: Iterable[str]) -> 
     for alias in aliases:
         key = _normalize_name(alias)
         if key in normalized_columns:
-            return norm
+            return normalized_columns[key]
+    return None
+
+
+def _scalar_field(
+    record: dict[str, Any],
+    normalized: dict[str, str],
+    aliases: Iterable[str],
+    *,
+    default: Any,
+) -> Any:
+    key = _find_column(normalized, aliases)
+    if key is None:
+        return default
+    value = record[key]
+    if isinstance(value, np.ndarray):
+        flat = value.ravel()
+        return flat[-1] if flat.size else default
+    if isinstance(value, list):
+        return value[-1] if value else default
+    return value
+
+
+def _as_numeric_array(value: Any) -> np.ndarray:
+    if isinstance(value, str):
+        parsed = _parse_csv_cell(value)
+        if parsed is value:
+            return np.array([], dtype=float)
+        value = parsed
+    arr = np.asarray(value)
+    if arr.dtype == object:
+        flattened = []
+        for item in arr.ravel():
+            try:
+                flattened.append(float(item))
+            except (TypeError, ValueError):
+                continue
+        return np.asarray(flattened, dtype=float)
+    return np.asarray(arr, dtype=float).ravel()
+
+
+def _parse_csv_cell(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    text = value.strip()
+    if not text:
+        return np.nan
+    if text.startswith("[") and text.endswith("]"):
+        try:
+            parsed = ast.literal_eval(text)
+            return np.asarray(parsed, dtype=float)
+        except (SyntaxError, ValueError, TypeError):
+            return np.fromstring(text.strip("[]"), sep=",")
+    return value
+
+
+def _as_float(value: Any, *, default: float = np.nan) -> float:
+    try:
+        if isinstance(value, np.ndarray):
+            value = value.ravel()[-1] if value.size else default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _as_float_or_none(value: Any) -> float | None:
+    result = _as_float(value, default=np.nan)
+    return result if math.isfinite(result) else None
+
+
+def _normalize_name(name: Any) -> str:
+    return str(name).strip().lower().replace(" ", "_").replace("-", "_")

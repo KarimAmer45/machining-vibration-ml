@@ -63,19 +63,19 @@ The demo data is synthetic, so the numbers are a smoke test for the pipeline rat
 
 ### Confusion Matrix
 
-![Confusion matrix comparing pure ML and physics-guided models](results/confusion_matrix.png)
+![Confusion matrix comparing pure ML and physics-guided models](../results/confusion_matrix.png)
 
 ### Feature Importance
 
-![Physics-guided feature importance](results/feature_importance.png)
+![Physics-guided feature importance](../results/feature_importance.png)
 
 ### FFT Examples
 
-![FFT examples with spindle and tooth-passing markers](results/fft_examples.png)
+![FFT examples with spindle and tooth-passing markers](../results/fft_examples.png)
 
 ### Prediction vs True
 
-![Predicted wear class versus true wear class](results/prediction_vs_true.png)
+![Predicted wear class versus true wear class](../results/prediction_vs_true.png)
 
 ## What This Demonstrates
 

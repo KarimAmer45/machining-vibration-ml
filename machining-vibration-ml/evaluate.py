@@ -8,6 +8,13 @@ Improvements:
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
+import sys
+
+# Reuse the shared feature and training modules from the repository root.
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.append(str(REPOSITORY_ROOT))
+
 import joblib, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
